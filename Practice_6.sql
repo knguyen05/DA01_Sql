@@ -78,6 +78,17 @@ from table1
 INNER JOIN table2
 on table1.month=table2.month and table1.country=table2.country;
 
+-----------------------------FIX ex6------------------
+SELECT TO_CHAR(trans_date, 'yyyy-mm') as month, country,
+COUNT(*) as trans_count,
+SUM(CASE 
+WHEN state = 'approved' THEN 1 ELSE 0 END) AS approved_count,
+SUM(amount) as trans_total_amount,
+SUM(CASE 
+WHEN state = 'approved' THEN amount ELSE 0 END) AS approved_total_amount
+FROM Transactions
+GROUP BY month, country;
+
 --ex7
 with table1 as
 (select product_id, min(year) as first_year
