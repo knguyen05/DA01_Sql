@@ -37,4 +37,54 @@ count( product_id) as  purchase_count
  group by transaction_date, user_id;
 
 --ex5
+with t1 as
+(SELECT user_id, tweet_date, tweet_count,
+lag(tweet_count) OVER(PARTITION BY user_id ORDER BY tweet_date) as rolling_1,
+lag(tweet_count,2) OVER(PARTITION BY user_id ORDER BY tweet_date) as rolling_2
+FROM tweets)
+select user_id, tweet_date,
+Case 
+when  rolling_1 is not null and rolling_2 is not null then round((tweet_count+rolling_1+rolling_2)/3.0, 2) 
+when rolling_1 is  null and rolling_2 is null then round((tweet_count+COALESCE(rolling_1,0)+COALESCE(rolling_2,0))/1.0, 2)
+ELSE round((tweet_count+COALESCE(rolling_1,0)+COALESCE(rolling_2,0))/2.0, 2) 
+END as rolling_avg_3d
+from t1
+
+--ex6_chua biet lam a, cho e xin code dap an voi
+
+--ex7
+with t1 as
+(SELECT category, product, SUM(spend) AS total_spend
+FROM product_spend
+WHERE EXTRACT(year from transaction_date) = 2022 
+GROUP BY category, product),
+t2 as
+(SELECT category, product, total_spend, 
+ROW_NUMBER() OVER (PARTITION BY category ORDER BY total_spend DESC) as rank_2
+FROM t1)
+select category, product, total_spend from t2
+where rank_2 <=2,
+
+--ex8
+with top10 AS
+(select song_id, rank
+from global_song_rank
+where rank<=10),
+count_name as
+(SELECT artists.artist_name,count(top10.song_id) as count
+FROM songs
+JOIN artists
+ON artists.artist_id = songs.artist_id
+JOIN top10
+ON songs.song_id= top10.song_id
+group by artists.artist_name),
+rank_name as
+(select artist_name, 
+DENSE_RANK() OVER( ORDER BY count desc) as artist_rank
+from count_name)
+select artist_name, artist_rank
+from rank_name
+where artist_rank<=5;
+
+
 
