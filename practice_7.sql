@@ -50,9 +50,17 @@ ELSE round((tweet_count+COALESCE(rolling_1,0)+COALESCE(rolling_2,0))/2.0, 2)
 END as rolling_avg_3d
 from t1
 
---ex6_chua biet lam a, cho e xin code dap an voi
+--ex6_
+WITH t1 AS (
+SELECT *,
+LAG(transaction_timestamp) OVER (PARTITION BY merchant_id, credit_card_id, amount ORDER BY transaction_timestamp) AS prev_time
+FROM transactions)
 
---ex7
+SELECT COUNT(*) AS payment_count
+FROM t1
+Where EXTRACT(minute from transaction_timestamp-prev_time)*60 + EXTRACT(second from transaction_timestamp-prev_time)<60*10
+
+ --ex7
 with t1 as
 (SELECT category, product, SUM(spend) AS total_spend
 FROM product_spend
