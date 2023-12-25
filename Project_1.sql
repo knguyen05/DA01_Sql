@@ -38,9 +38,21 @@ select
 percentile_cont(0.25) WITHIN GROUP (ORDER BY QUANTITYORDERED ) as Q1,
 percentile_cont(0.75) WITHIN GROUP (ORDER BY QUANTITYORDERED ) as Q3,
 percentile_cont(0.75) WITHIN GROUP (ORDER BY QUANTITYORDERED )-percentile_cont(0.25) WITHIN GROUP (ORDER BY QUANTITYORDERED ) as IQR
-from sales_dataset_rfm_prj) a ) 
-Select * from outlier
-where users< (select min_value from twt_min_max_value)
-or users>(select max_value from twt_min_max_value)
+from sales_dataset_rfm_prj) as a ) 
+Select * from sales_dataset_rfm_prj
+where QUANTITYORDERED< (select min_value from outlier)
+or QUANTITYORDERED>(select max_value from outlier)
 
 --cach2_Z-score
+with outlier as
+(select QUANTITYORDERED,
+(select avg(QUANTITYORDERED) from sales_dataset_rfm_prj) as avg,
+(select stddev(QUANTITYORDERED) from sales_dataset_rfm_prj) as stddev 
+ from sales_dataset_rfm_prj)
+ select QUANTITYORDERED, (QUANTITYORDERED-avg)/stddev as z_score
+ from outlier
+ where abs((QUANTITYORDERED-avg)/stddev)>3;
+
+--6 CREATE TABLE SALES_DATASET_RFM_PRJ_CLEAN as
+CREATE TABLE SALES_DATASET_RFM_PRJ_CLEAN as
+(SELECT * from sales_dataset_rfm_prj)
