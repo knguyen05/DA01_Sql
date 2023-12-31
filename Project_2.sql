@@ -4,7 +4,7 @@ FORMAT_DATETIME('%Y-%m', created_at) AS month_year,
 count( distinct user_id) as total_user,
 COUNTIF(status = 'Complete') as total_order
 from bigquery-public-data.thelook_ecommerce.order_items
-where created_at BETWEEN TIMESTAMP('2019-01-01') AND TIMESTAMP('2022-04-30')
+where created_at BETWEEN '2019-01-01' AND '2022-04-30'
 group by month_year
 order by month_year;
 
@@ -14,7 +14,7 @@ FORMAT_DATETIME('%Y-%m', created_at) AS month_year,
 count(distinct user_id) as distinct_users,
 sum(sale_price)/count(distinct order_id) as average_order_value
 from bigquery-public-data.thelook_ecommerce.order_items
-where created_at BETWEEN TIMESTAMP('2019-01-01') AND TIMESTAMP('2022-04-30')
+where created_at BETWEEN '2019-01-01' AND '2022-04-30'
 group by month_year
 order by month_year;
 
@@ -24,7 +24,7 @@ select first_name,last_name, gender,age,
 DENSE_RANK() OVER(PARTITION BY gender ORDER BY age ASC) AS youngest_rank,
 DENSE_RANK() OVER(PARTITION BY gender ORDER BY age DESC) AS oldest_rank
 from bigquery-public-data.thelook_ecommerce.users
-where created_at BETWEEN TIMESTAMP('2019-01-01') AND TIMESTAMP('2022-04-30'))
+where created_at BETWEEN '2019-01-01' AND '2022-04-30')
 select first_name,last_name, gender,age,
 CASE WHEN youngest_rank = 1 THEN 'youngest'ELSE 'oldest' END AS tag
 from t1
