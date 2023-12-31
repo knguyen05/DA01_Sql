@@ -73,6 +73,7 @@ select t1.dates, t1.product_category as product_categories, sum(t1.product_retai
 from t1
 JOIN t2 ON t1.sold_at = t2.created_at
 where sold_at is not null and sold_at between '2022-01-15' and'2022-04-15'
-group by t1.dates, t1.product_category ;
+group by t1.dates, t1.product_category 
+order by t1.dates, t1.product_category;
 
 
